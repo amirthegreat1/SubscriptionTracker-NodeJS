@@ -1,30 +1,32 @@
 import { Router } from "express";
+import { authorize } from "../middlewares/auth.middleware.js";
+import {
+  createSubscription,
+  getAllSubscriptionsbyUserId,
+  getAllSubscriptions,
+  updateSubscription,
+  deleteSubscription,
+  cancelSubscription,
+  getAllUpcomingRenewals,
+} from "../controllers/subscription.controller.js";
+
 const subscriptionRouter = Router();
 // Define subscription routes
-subscriptionRouter.get("/", (req, res) =>
-  res.send({ title: "GET all subscriptions" })
-);
-subscriptionRouter.get("/:id", (req, res) =>
-  res.send({ title: `GET subscription with ID ${req.params.id}` })
-);
-subscriptionRouter.post("/", (req, res) =>
-  res.send({ title: "Create new subscription" })
-);
-subscriptionRouter.put("/:id", (req, res) =>
-  res.send({ title: `Update subscription with ID ${req.params.id}` })
-);
-subscriptionRouter.delete("/:id", (req, res) =>
-  res.send({ title: `Delete subscription with ID ${req.params.id}` })
-);
-subscriptionRouter.get("/user/:id", (req, res) =>
-  res.send({ title: `GET subscriptions for user with ID ${req.params.userId}` })
-);
-subscriptionRouter.put("/user/:id/cancel", (req, res) =>
-  res.send({
-    title: `Cancel subscription for user with ID ${req.params.userId}`,
-  })
-);
-subscriptionRouter.get("/all-upcoming-renewals"),
-  (req, res) => res.send({ title: "GET all subscriptions" });
+// GET all subscriptions
+subscriptionRouter.get("/", authorize, getAllSubscriptions);
+// GET all upcoming renewals (MUST be before /:id route to avoid route conflict)
+subscriptionRouter.get("/upcoming", authorize, getAllUpcomingRenewals);
+// GET subscription by subscription id
+subscriptionRouter.get("/:id", authorize, createSubscription);
+// POST create subscription
+subscriptionRouter.post("/", authorize, createSubscription);
+// PUT update subscription
+subscriptionRouter.put("/:id", authorize, updateSubscription);
+// DELETE delete subscription
+subscriptionRouter.delete("/:id", authorize, deleteSubscription);
+// GET all subscriptions by user id
+subscriptionRouter.get("/user/:id", authorize, getAllSubscriptionsbyUserId);
+// PUT cancel subscription
+subscriptionRouter.put("/user/:id/cancel", authorize, cancelSubscription);
 
 export default subscriptionRouter;

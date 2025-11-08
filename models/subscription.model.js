@@ -28,7 +28,15 @@ const subscriptionSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Category is required"],
-      enum: ["Health", "Fitness", "Nutrition", "Wellness"],
+      enum: [
+        "Health",
+        "Fitness",
+        "Nutrition",
+        "Wellness",
+        "Entertainment",
+        "Education",
+        "Other",
+      ],
     },
     PayementMethod: {
       type: String,
@@ -70,20 +78,21 @@ const subscriptionSchema = new mongoose.Schema(
 );
 //Auto calculate renewal date
 subscriptionSchema.pre("save", function (next) {
-  if (!this.renewalDate) {
+  if (!this.renewalDate && this.startDate) {
     const renewalperiods = {
       daily: 1,
       Weekly: 7,
       Monthly: 30,
       Yearly: 365,
     };
-    this.renewalDate = new Date();
+    // Calculate renewal date from startDate, not from today
+    this.renewalDate = new Date(this.startDate);
     this.renewalDate.setDate(
       this.renewalDate.getDate() + renewalperiods[this.frequency]
     );
   }
   // auto update status when renewal date is reached
-  if (this.renewalDate <= new Date()) {
+  if (this.renewalDate && this.renewalDate <= new Date()) {
     this.status = "expired";
   }
   next();
