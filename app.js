@@ -19,12 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // arcjet middleware
 app.use(arcjetMiddleware);
-// error middleware
-app.use(errorMiddleware);
 // routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
+// error middleware
+app.use(errorMiddleware);
 // start server
 app.listen(PORT, async () => {
   console.log(`Server listening on http://localhost:${PORT}`);
